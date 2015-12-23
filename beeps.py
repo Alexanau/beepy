@@ -60,9 +60,7 @@ def noise(length):
 
 ####################################
 
-#for x in range(5):
-#  tone(1000,0.5)
-#  silence(.5)
+for x in range(5):
+  tone(1000,0.5)
+  silence(.5)
 
-for x in range(20):
-  print sine[x]
