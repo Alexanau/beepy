@@ -18,6 +18,8 @@ for opt,arg in optlist:
   if opt == '-r':
     BITRATE = int(arg)
 
+MAX = (1<<BITDEPTH)-1
+MIN = 0
 
 if SIGNED:
   MAX=(1<<BITDEPTH-1)-1
@@ -27,13 +29,16 @@ quiet = int((MAX+MIN)/2)
 sine = []
 for x in range(int(BITRATE)):
   scale = (1+math.sin(float(x)/BITRATE * 2.0 * math.pi))/2.0
-  sine.append(int(MIN+MAX*scale))
+  sine.append(int(MIN+(MAX-MIN)*scale))
 
 
 ##################################
 def writebytes(num,bits):
   while bits >0:
-    sys.stdout.write(chr(num&0xFF))
+    try:
+      sys.stdout.write(chr(num&0xFF))
+    except IOError:
+      exit(0)
     num = num >> 8
     bits -=8
 
@@ -55,6 +60,9 @@ def noise(length):
 
 ####################################
 
-for x in range(5):
-  tone(1000,0.5)
-  silence(.5)
+#for x in range(5):
+#  tone(1000,0.5)
+#  silence(.5)
+
+for x in range(20):
+  print sine[x]
