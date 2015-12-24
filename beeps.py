@@ -7,16 +7,28 @@ import getopt
 BITRATE = 8000
 BITDEPTH = 8
 SIGNED = False
+STEREO = False
+
+msg = '123'
 MAX = (1<<BITDEPTH)-1
 MIN = 0
-optlist, args = getopt.getopt(sys.argv[1:],'sr:d:')
+optlist, args = getopt.getopt(sys.argv[1:],'cSsr:d:m:')
 for opt,arg in optlist:
   if opt == '-d':
     BITDEPTH=int(arg)
+  if opt == '-c':
+    STEREO = True
+    SIGNED = True
+    BITRATE = 44100
+    BITDEPTH = 16
+  if opt == '-S':
+    STEREO = True
   if opt == '-s':
     SIGNED = True
   if opt == '-r':
     BITRATE = int(arg)
+  if opt == '-m':
+    msg = arg
 
 MAX = (1<<BITDEPTH)-1
 MIN = 0
@@ -34,13 +46,17 @@ for x in range(int(BITRATE)):
 
 ##################################
 def writebytes(num,bits):
+  buff = []
   while bits >0:
     try:
-      sys.stdout.write(chr(num&0xFF))
+      buff.append(chr(num&0xFF))
     except IOError:
       exit(0)
     num = num >> 8
     bits -=8
+  sys.stdout.write(''.join(buff))
+  if STEREO:
+    sys.stdout.write(''.join(buff))
 
     
 ##################################
@@ -55,12 +71,16 @@ def silence(length):
 
 def noise(length):
   for x in range(int(length*BITRATE)):
-    writebytes(random.randint(MIN,MAX))
+    writebytes(random.randint(MIN,MAX), BITDEPTH)
 
 
 ####################################
 
-for x in range(5):
-  tone(1000,0.5)
-  silence(.5)
 
+for c in msg:
+  noise(.5)
+  silence(1)
+  for x in range(int(c)):
+    tone(800,.6)
+    silence(1)
+  noise(.5)
